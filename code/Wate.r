@@ -178,14 +178,37 @@ calc_water_area <- function(raster, res_x, res_y){
     res_x <- 0.03
     res_y <- 0.03
   }
-  vals <- getValues(x)
+  vals <- raster::getValues(raster)
   water_cells <- sum(vals ==1, na.rm = T)
   water_area <-  sum(vals ==1, na.rm = T) * res_x * res_y
   return(water_area)
 }
 
 
+area_Jan <-  data.frame(matrix(nrow=30,ncol=2))
+colnames(area_Jan) <- c("date","area") 
 
+for (i in 1:length(NDWI_Jan_Thresh)) {
+  raster <- NDWI_Jan_Thresh[[i]]
+  Date <- substr(raster@title, 77, 84)
+  area_Jan[i, ]$area <- calc_water_area(raster)
+  area_Jan[i, ]$date <- Date
+  message(paste0("finished date:", Date))
+}
+
+area_Aug <-  data.frame(matrix(nrow=31,ncol=2))
+colnames(area_Aug) <- c("date","area") 
+
+for (i in 1:length(NDWI_Aug_Thresh)) {
+  raster <- NDWI_Aug_Thresh[[i]]
+  Date <- substr(raster@title, 77, 84)
+  area_Aug[i, ]$area <- calc_water_area(raster)
+  area_Aug[i, ]$date <- Date
+  message(paste0("finished date:", Date))
+}
+
+write.csv(area_Jan,file="water_area_jan_skm.csv")
+write.csv(area_Aug,file="water_area_aug_skm.csv")
 #########
 
 #-find threshold
